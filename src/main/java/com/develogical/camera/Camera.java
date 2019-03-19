@@ -5,6 +5,7 @@ public class Camera {
     private final Sensor sensor;
     private final MemoryCard memorycard;
     private boolean ison = false;
+    public boolean copyinProgress = false;
 
     public Camera(Sensor sensor, MemoryCard memorycard) {
         this.sensor = sensor;
@@ -17,19 +18,25 @@ public class Camera {
             memorycard.write(dateToWriteToMemoryCard, new WriteCompleteListener() {
                 @Override
                 public void writeComplete() {
-                    System.out.println("This is really getting called");
+                    Camera.this.copyinProgress = false;
+                    if (!ison) {
+                        sensor.powerDown();
+                    }
                 }
             });
+            copyinProgress = true;
         }
     }
+
     public void powerOn() {
-        ison=true;
+        ison = true;
         sensor.powerUp();
     }
 
     public void powerOff() {
-        ison=false;
-        sensor.powerDown();
-
+        ison = false;
+        if (!this.copyinProgress) {
+            sensor.powerDown();
+        }
     }
 }

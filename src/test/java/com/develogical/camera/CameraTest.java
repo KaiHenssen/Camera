@@ -27,10 +27,10 @@ public class CameraTest {
         verify(sensor).powerDown();
     }
 
+    /*
     @Test
     public void pressingShutterWhilePowerOn() {
-        Sensor sensor = mock(Sensor.class);
-        MemoryCard memorycard = mock(MemoryCard.class);
+        Sensor sensor = mock(Sensor.class);MemoryCard memorycard = mock(MemoryCard.class);
 
         Camera camera = new Camera(sensor, memorycard);
 
@@ -42,6 +42,19 @@ public class CameraTest {
         verify(memorycard).write(eq(sensor.readData()), argumentCaptor.capture());
 
         argumentCaptor.getValue().writeComplete();
+    }
+    */
+
+    @Test
+    public void pressingShutterWhilePowerOn() {
+        Sensor sensor = mock(Sensor.class);MemoryCard memorycard = mock(MemoryCard.class);
+
+        Camera camera = new Camera(sensor, memorycard);
+
+        camera.powerOn();
+        camera.pressShutter();
+
+        verify(memorycard).write(eq(sensor.readData()), any());
     }
 
     @Test
@@ -56,13 +69,42 @@ public class CameraTest {
     }
 
     @Test
-    public void x() {
-        // jibba jabba
+    public void correctbehaviourswitchingoffwhendatabeingwritten() {
 
-        // verify that sensor isn't switched off
+        Sensor sensor = mock(Sensor.class);
+        MemoryCard memorycard = mock(MemoryCard.class);
+        ArgumentCaptor<WriteCompleteListener> argumentCaptor = ArgumentCaptor.forClass(WriteCompleteListener.class);
 
-        // tell it that the write has finished
+        Camera camera = new Camera(sensor, memorycard);
 
-        // verify that sensor is switched off
+        camera.powerOn();
+        camera.pressShutter();
+        verify(memorycard).write(eq(sensor.readData()), argumentCaptor.capture());
+
+        camera.powerOff();
+
+        verify(sensor, times(0)).powerDown();
+
+        argumentCaptor.getValue().writeComplete();
+
+        verify(sensor, times(1)).powerDown();
+    }
+
+    @Test
+    public void bug() {
+
+        Sensor sensor = mock(Sensor.class);
+        MemoryCard memorycard = mock(MemoryCard.class);
+        ArgumentCaptor<WriteCompleteListener> argumentCaptor = ArgumentCaptor.forClass(WriteCompleteListener.class);
+
+        Camera camera = new Camera(sensor, memorycard);
+
+        camera.powerOn();
+        camera.pressShutter();
+        verify(memorycard).write(eq(sensor.readData()), argumentCaptor.capture());
+
+        argumentCaptor.getValue().writeComplete();
+
+        verify(sensor, times(0)).powerDown();
     }
 }
