@@ -4,20 +4,22 @@ public class Camera {
 
     private final Sensor sensor;
     private final MemoryCard memorycard;
-    private final WriteCompleteListener writeCompleteListener;
     private boolean ison = false;
 
-    public Camera(Sensor sensor, MemoryCard memorycard, WriteCompleteListener writeCompleteListener) {
+    public Camera(Sensor sensor, MemoryCard memorycard) {
         this.sensor = sensor;
         this.memorycard = memorycard;
-        this.writeCompleteListener = writeCompleteListener;
     }
 
     public void pressShutter() {
         if (ison) {
-            //WriteCompleteListener writeCompleteListener = new WriteCompleteListener();
             byte[] dateToWriteToMemoryCard = sensor.readData();
-            memorycard.write(dateToWriteToMemoryCard, writeCompleteListener);
+            memorycard.write(dateToWriteToMemoryCard, new WriteCompleteListener() {
+                @Override
+                public void writeComplete() {
+                    System.out.println("This is really getting called");
+                }
+            });
         }
     }
     public void powerOn() {
